@@ -10,6 +10,9 @@ app.use(morgan("dev"));
 app.use(cors());
 dotenv.config()
 
+const userRouter = require("./routers/routes/user")
+app.use("/user", userRouter)
+
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
