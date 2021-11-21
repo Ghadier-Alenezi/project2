@@ -13,6 +13,9 @@ dotenv.config()
 const userRouter = require("./routers/routes/user")
 app.use("/user", userRouter)
 
+const levelRouter = require("./routers/routes/level")
+app.use("/level", levelRouter)
+
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
