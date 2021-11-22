@@ -13,8 +13,8 @@ dotenv.config()
 const userRouter = require("./routers/routes/user")
 app.use("/user", userRouter)
 
-const levelRouter = require("./routers/routes/level")
-app.use("/level", levelRouter)
+const lessonRouter = require("./routers/routes/lesson")
+app.use("/lesson", lessonRouter)
 
 const PORT = process.env.PORT || 3001;
 
