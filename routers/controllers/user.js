@@ -3,7 +3,7 @@ const userModel = require("./../../db/models/userSchema");
 // get all users
 const getAllusers = (req, res) => {
   userModel
-    .find()
+    .find({})
     .then((result) => {
       res.json(result);
     })
@@ -46,7 +46,6 @@ const updateUser = (req, res) => {
       },
       { new: true }
     )
-    .exect()
     .then((result) => {
       res.json(result);
     })
@@ -59,8 +58,7 @@ const updateUser = (req, res) => {
 const deleteUser = (req, res) => {
   const { id } = req.params;
   userModel
-    .findByIdAndDelete((_id = id),
-    { new: true })
+    .findByIdAndDelete((_id = id), { new: true })
     .then((result) => {
       res.json(result);
     })
