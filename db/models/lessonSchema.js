@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const lessonSchema = new mongoose.Schema({
-  level: { type: Number, default: 1},
+  level: { type: Number, default: 1 },
   title: { type: String, required: true },
   lesson: [{ type: String, required: true }],
   src: { type: String },
