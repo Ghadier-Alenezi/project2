@@ -1,4 +1,5 @@
 const express = require("express");
+// const auth = require("./../controllers/auth");
 const {
   getAllLessons,
   addLesson,

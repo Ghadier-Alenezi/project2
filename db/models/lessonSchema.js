@@ -8,6 +8,8 @@ const lessonSchema = new mongoose.Schema({
   song: { type: String },
   joke: { type: String },
   quiz: { type: String },
+},{
+  timestamps: true,
 });
 
 module.exports = mongoose.model("Lesson", lessonSchema);
