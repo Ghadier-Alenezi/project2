@@ -6,7 +6,7 @@ const getAllLessons = async (req, res) => {
     lessonModel.find().then((result) => {
       res.json(result);
     });
-  } catch (err) {
+  } catch (error) {
     res.status(500).send();
   }
 };
@@ -27,8 +27,8 @@ const addLesson = (req, res) => {
     newLesson.save().then((result) => {
       res.json(result);
     });
-  } catch (err) {
-    res.send(err);
+  } catch (error) {
+    res.send(error);
   }
 };
 
@@ -54,8 +54,8 @@ const updateLesson = (req, res) => {
       .then((result) => {
         res.json(result);
       });
-  } catch (err) {
-    res.send(err);
+  } catch (error) {
+    res.send(error);
   }
 };
 
@@ -66,8 +66,8 @@ const deleteLesson = (req, res) => {
     lessonModel.findByIdAndDelete((_id = id), { new: true }).then((result) => {
       res.json(result);
     });
-  } catch (err) {
-    res.send(err);
+  } catch (error) {
+    res.send(error);
   }
 };
 

@@ -1,6 +1,4 @@
 const userModel = require("./../../db/models/userSchema");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 
 // get all users
 const getAllusers = async (req, res) => {
@@ -14,101 +12,83 @@ const getAllusers = async (req, res) => {
     });
 };
 
-// add user
-const addUser = async (req, res) => {
+// get user by id
+const idUser = (req, res) => {
   try {
-    const { name, email, password, age } = req.body;
-    // validation
-    if (!email || !password || !name) {
-      return res.status(400).json({
-        errorMessage: "You need to enter you name, email and password.",
+    const { id } = req.params;
+    userModel
+      .findById(id)
+      .exec()
+      .then((result) => {
+        res.send(result);
       });
-    }
-
-    if (password.length < 6) {
-      return res.status(400).json({
-        errorMessage: "please enter a password of at least 6 chaeacters",
-      });
-    }
-    // make sure no account exist for this email
-
-    const existUser = await userModel.findOne({ email });
-    if (existUser) {
-      return res.status(400).json({
-        errorMessage: "An account with this email already exists.",
-      });
-    }
-
-    // hash password
-    const salt = await bcrypt.genSalt();
-    const passwordHash = await bcrypt.hash(password, salt);
-    console.log(passwordHash);
-
-    // save user in db
-    const newUser = new userModel({
-      name,
-      email,
-      passwordHash,
-      age,
-    });
-    const savedUser = await newUser.save().then((result) => {
-      res.json(result);
-    });
-
-    // create JWT token
-    const token = jwt.sign(
-      {
-        id: savedUser._id,
-      },
-      process.env.JWT_SECERT
-    );
-    res.cookie("token", token, { httpOnly: true }).send();
+    // send user info
   } catch (error) {
     res.send(error);
   }
 };
 
-// update user
-const updateUser = async (req, res) => {
-  const { id } = req.params;
-  const { name, email, password, age } = req.body;
-  userModel
-    .findByIdAndUpdate(
-      (_id = id),
-      {
+// add user
+const addUser = async (req, res) => {
+  userModel.findOne({ email: req.body.email }).then((user) => {
+    if (user) {
+      return res.status(400).json("Email already registerd");
+    } else {
+      const { name, email, password, age } = req.body;
+      const newUser = new userModel({
         name,
         email,
         password,
         age,
-      },
-      { new: true }
-    )
-    .then((result) => {
-      res.json(result);
-    })
-    .catch((err) => {
-      res.send(err);
-    });
+      });
+      newUser.save();
+      if (newUser) {
+        res.status(200).json({message:"registerd successfully", user: newUser})
+      }
+    }
+  });
+};
+
+// update user
+const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email, password, age } = req.body;
+    userModel
+      .findByIdAndUpdate(
+        (_id = id),
+        {
+          name,
+          email,
+          password,
+          age,
+        },
+        { new: true }
+      )
+      .then((result) => {
+        res.json(result);
+      });
+  } catch (error) {
+    res.send(error);
+  }
 };
 
 //  delete user
 const deleteUser = (req, res) => {
-  const { id } = req.params;
-  userModel
-    .findByIdAndDelete((_id = id), { new: true })
-    .then((result) => {
+  try {
+    const { id } = req.params;
+    userModel.findByIdAndDelete((_id = id), { new: true }).then((result) => {
       res.json(result);
-    })
-    .catch((err) => {
-      res.send(err);
     });
+  } catch (error) {
+    res.send(error);
+  }
 };
 
 // login user
-const loginUser = async (req, res) => {
+const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
     if (!email || !password) {
       return res.status(400).json({
         errorMessage: "You need to enter your email and password.",
@@ -116,35 +96,35 @@ const loginUser = async (req, res) => {
     }
     // get user account
     const existUser = await userModel.findOne({ email });
-    if (existUser) {
+    if (!existUser) {
       return res.status(401).json({
         errorMessage: "wrong email or password",
       });
     }
     // check the password
-    const correctPass = await bcrypt.compare(password, existUser.passwordHash);
-
-    if (!correctPass)
-      return res.status(401).json({
-        errorMessage: "wrong email or password",
-      });
-
-    // JWT token
-    const token = jwt.sign(
-      {
-        id: existUser._id,
-      },
-      process.env.JWT_SECERT
-    );
-    res.cookie("token", token, { httpOnly: true }).send();
+    if (password === existUser.password);
+    res.send({ existUser });
   } catch (error) {
     res.send(error);
   }
 };
+
+// log Out user
+const logOut = (req, res) => {
+  try {
+    res.clearCookie("clear");
+    res.send({ message: "log out successfully" });
+  } catch (error) {
+    return res.json(null);
+  }
+};
+
 module.exports = {
   getAllusers,
   addUser,
   updateUser,
   deleteUser,
-  loginUser,
+  login,
+  logOut,
+  idUser,
 };

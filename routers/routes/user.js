@@ -1,12 +1,13 @@
 const express = require("express");
-// const auth = require("./../controllers/auth");
 
 const {
   getAllusers,
   addUser,
   updateUser,
   deleteUser,
-  loginUser
+  login,
+  logOut,
+  idUser
 } = require("./../controllers/user");
 
 const userRouter = express.Router();
@@ -15,6 +16,8 @@ userRouter.get("/", getAllusers);
 userRouter.post("/newUser", addUser);
 userRouter.put("/:id", updateUser);
 userRouter.delete("/:id", deleteUser);
-userRouter.post("/login", loginUser);
+userRouter.post("/login", login);
+userRouter.post("/logOut", logOut);
+userRouter.get("/byId/:id", idUser);
 
 module.exports = userRouter;
