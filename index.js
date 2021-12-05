@@ -12,6 +12,9 @@ app.use(cors());
 
 dotenv.config();
 
+const roleRouter = require("./routers/routes/role");
+app.use(roleRouter);
+
 const userRouter = require("./routers/routes/user");
 app.use("/user", userRouter);
 
