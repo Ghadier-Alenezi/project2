@@ -1,9 +1,16 @@
-const userModel = require("./../../db/models/userSchema");
+const userModel = require("../../db/models/user");
+
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+
+const SALT = Number(process.env.SALT);
+const secret = process.env.SECRET_KEY;
 
 // get all users
 const getAllusers = async (req, res) => {
   userModel
-    .find({})
+    .find()
     .then((result) => {
       res.json(result);
     })
@@ -14,109 +21,117 @@ const getAllusers = async (req, res) => {
 
 // get user by id
 const idUser = (req, res) => {
-  try {
-    const { id } = req.params;
-    userModel
-      .findById(id)
-      .exec()
-      .then((result) => {
-        res.send(result);
-      });
-    // send user info
-  } catch (error) {
-    res.send(error);
-  }
+  // try {
+  //   const { id } = req.params;
+  //   userModel
+  //     .findById(id)
+  //     .exec()
+  //     .then((result) => {
+  //       res.send(result);
+  //     });
+  //   // send user info
+  // } catch (error) {
+  //   res.send(error);
+  // }
 };
 
 // add user
 const addUser = async (req, res) => {
-  userModel.findOne({ email: req.body.email }).then((user) => {
-    if (user) {
-      return res.status(400).json("Email already registerd");
-    } else {
-      const { name, email, password, age } = req.body;
-      const newUser = new userModel({
-        name,
-        email,
-        password,
-        age,
-      });
-      newUser.save();
-      if (newUser) {
-        res.status(200).json({message:"registerd successfully", user: newUser})
-      }
-    }
-  });
+  try {
+    const { name, email, password, age, role } = req.body;
+    const savedEmail = email.toLowerCase();
+    const hashedPassword = await bcrypt.hash(password, SALT);
+
+    const newUser = new userModel({
+      name,
+      email: savedEmail,
+      password: hashedPassword,
+      age,
+      role,
+    });
+    newUser.save().then((result) => {
+      res.status(201).json(result);
+    });
+  } catch (error) {
+    res.status(400).send(err);
+  }
 };
 
 // update user
 const updateUser = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { name, email, password, age } = req.body;
-    userModel
-      .findByIdAndUpdate(
-        (_id = id),
-        {
-          name,
-          email,
-          password,
-          age,
-        },
-        { new: true }
-      )
-      .then((result) => {
-        res.json(result);
-      });
-  } catch (error) {
-    res.send(error);
-  }
+  // try {
+  //   const { id } = req.params;
+  //   const { name, email, password, age } = req.body;
+  //   userModel
+  //     .findByIdAndUpdate(
+  //       (_id = id),
+  //       {
+  //         name,
+  //         email,
+  //         password,
+  //         age,
+  //       },
+  //       { new: true }
+  //     )
+  //     .exec()
+  //     .then((result) => {
+  //       res.json(result);
+  //     });
+  // } catch (err) {
+  //   res.send(err);
+  // }
 };
 
 //  delete user
 const deleteUser = (req, res) => {
-  try {
-    const { id } = req.params;
-    userModel.findByIdAndDelete((_id = id), { new: true }).then((result) => {
-      res.json(result);
-    });
-  } catch (error) {
-    res.send(error);
-  }
+  // try {
+  //   const { id } = req.params;
+  //   userModel.findByIdAndDelete((_id = id), { new: true }).then((result) => {
+  //     res.json(result);
+  //   });
+  // } catch (error) {
+  //   res.send(error);
+  // }
 };
 
 // login user
 const login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({
-        errorMessage: "You need to enter your email and password.",
-      });
+  const { email, password } = req.body;
+  const savedEmail = email.toLowerCase();
+
+  userModel.findOne({ email: savedEmail }).then(async (result) => {
+    if (result) {
+      if (result.email == savedEmail) {
+        const hashedPassword = await bcrypt.compare(password, result.password);
+        const payload = {
+          role: result.role,
+        };
+        const options = {
+          expiresIn: "600m",
+        };
+        if (hashedPassword) {
+          const token = jwt.sign(payload, secret, options);
+          res.status(200).json({ result, token });
+        } else {
+          res.status(400).send("invalid email or password");
+        }
+      } else {
+        res.status(400).send("invalid email or password");
+      }
+    } else {
+      res.status(404).send("this email not exist!");
     }
-    // get user account
-    const existUser = await userModel.findOne({ email });
-    if (!existUser) {
-      return res.status(401).json({
-        errorMessage: "wrong email or password",
-      });
-    }
-    // check the password
-    if (password === existUser.password);
-    res.send({ existUser });
-  } catch (error) {
-    res.send(error);
-  }
+  });
 };
 
 // log Out user
 const logOut = (req, res) => {
-  try {
-    res.clearCookie("clear");
-    res.send({ message: "log out successfully" });
-  } catch (error) {
-    return res.json(null);
-  }
+  // try {
+  //   res.clearCookie("clear");
+  //   res.send({ message: "log out successfully" });
+  // } catch (error) {
+  //   return res.json(null);
+  // }
 };
 
 module.exports = {

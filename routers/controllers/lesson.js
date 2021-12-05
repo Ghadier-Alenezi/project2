@@ -1,74 +1,74 @@
-const lessonModel = require("./../../db/models/lessonSchema");
+// const lessonModel = require("./../../db/models/lessonSchema");
 
-// get all lessons
-const getAllLessons = async (req, res) => {
-  try {
-    lessonModel.find().then((result) => {
-      res.json(result);
-    });
-  } catch (error) {
-    res.status(500).send();
-  }
-};
+// // get all lessons
+// const getAllLessons = async (req, res) => {
+//   try {
+//     lessonModel.find().then((result) => {
+//       res.json(result);
+//     });
+//   } catch (error) {
+//     res.status(500).send();
+//   }
+// };
 
-// add lesson
-const addLesson = (req, res) => {
-  try {
-    const { level, title, lesson, src, song, joke, quiz } = req.body;
-    const newLesson = new lessonModel({
-      level,
-      title,
-      lesson,
-      src,
-      song,
-      joke,
-      quiz,
-    });
-    newLesson.save().then((result) => {
-      res.json(result);
-    });
-  } catch (error) {
-    res.send(error);
-  }
-};
+// // add lesson
+// const addLesson = (req, res) => {
+//   try {
+//     const { level, title, lesson, src, song, joke, quiz } = req.body;
+//     const newLesson = new lessonModel({
+//       level,
+//       title,
+//       lesson,
+//       src,
+//       song,
+//       joke,
+//       quiz,
+//     });
+//     newLesson.save().then((result) => {
+//       res.json(result);
+//     });
+//   } catch (error) {
+//     res.send(error);
+//   }
+// };
 
-// update lesson
-const updateLesson = (req, res) => {
-  try {
-    const { id } = req.params;
-    const { level, title, lesson, src, song, joke, quiz } = req.body;
-    lessonModel
-      .findByIdAndUpdate(
-        (_id = id),
-        {
-          level,
-          title,
-          lesson,
-          src,
-          song,
-          joke,
-          quiz,
-        },
-        { new: true }
-      )
-      .then((result) => {
-        res.json(result);
-      });
-  } catch (error) {
-    res.send(error);
-  }
-};
+// // update lesson
+// const updateLesson = (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const { level, title, lesson, src, song, joke, quiz } = req.body;
+//     lessonModel
+//       .findByIdAndUpdate(
+//         (_id = id),
+//         {
+//           level,
+//           title,
+//           lesson,
+//           src,
+//           song,
+//           joke,
+//           quiz,
+//         },
+//         { new: true }
+//       )
+//       .then((result) => {
+//         res.json(result);
+//       });
+//   } catch (error) {
+//     res.send(error);
+//   }
+// };
 
-// delete lesson
-const deleteLesson = (req, res) => {
-  try {
-    const { id } = req.params;
-    lessonModel.findByIdAndDelete((_id = id), { new: true }).then((result) => {
-      res.json(result);
-    });
-  } catch (error) {
-    res.send(error);
-  }
-};
+// // delete lesson
+// const deleteLesson = (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     lessonModel.findByIdAndDelete((_id = id), { new: true }).then((result) => {
+//       res.json(result);
+//     });
+//   } catch (error) {
+//     res.send(error);
+//   }
+// };
 
-module.exports = { getAllLessons, addLesson, updateLesson, deleteLesson };
+// module.exports = { getAllLessons, addLesson, updateLesson, deleteLesson };
