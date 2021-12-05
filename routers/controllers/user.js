@@ -12,27 +12,26 @@ const getAllusers = async (req, res) => {
   userModel
     .find()
     .then((result) => {
-      res.json(result);
+      res.status(200).json(result);
     })
     .catch((error) => {
-      res.send(error);
+      res.status(400).send(error);
     });
 };
 
 // get user by id
 const idUser = (req, res) => {
-  // try {
-  //   const { id } = req.params;
-  //   userModel
-  //     .findById(id)
-  //     .exec()
-  //     .then((result) => {
-  //       res.send(result);
-  //     });
-  //   // send user info
-  // } catch (error) {
-  //   res.send(error);
-  // }
+  try {
+    const { id } = req.params;
+    userModel
+      .findById(id)
+      .exec()
+      .then((result) => {
+        res.status(200).send(result);
+      });
+  } catch (error) {
+    res.status(400).send(error);
+  }
 };
 
 // add user
@@ -59,79 +58,86 @@ const addUser = async (req, res) => {
 
 // update user
 const updateUser = async (req, res) => {
-  // try {
-  //   const { id } = req.params;
-  //   const { name, email, password, age } = req.body;
-  //   userModel
-  //     .findByIdAndUpdate(
-  //       (_id = id),
-  //       {
-  //         name,
-  //         email,
-  //         password,
-  //         age,
-  //       },
-  //       { new: true }
-  //     )
-  //     .exec()
-  //     .then((result) => {
-  //       res.json(result);
-  //     });
-  // } catch (err) {
-  //   res.send(err);
-  // }
+  try {
+    const { id } = req.params;
+    const { name, email, password, age } = req.body;
+    userModel
+      .findByIdAndUpdate(
+        (_id = id),
+        {
+          name,
+          email,
+          password,
+          age,
+        },
+        { new: true }
+      )
+      .exec()
+      .then((result) => {
+        res.status(200).json(result);
+      });
+  } catch (err) {
+    res.status(400).send(err);
+  }
 };
 
 //  delete user
 const deleteUser = (req, res) => {
-  // try {
-  //   const { id } = req.params;
-  //   userModel.findByIdAndDelete((_id = id), { new: true }).then((result) => {
-  //     res.json(result);
-  //   });
-  // } catch (error) {
-  //   res.send(error);
-  // }
+  try {
+    const { id } = req.params;
+    userModel.findByIdAndDelete((_id = id)).then((result) => {
+      res.status(200).json(result);
+    });
+  } catch (error) {
+    res.status(400).send(error);
+  }
 };
 
 // login user
 const login = async (req, res) => {
   const { email, password } = req.body;
   const savedEmail = email.toLowerCase();
-
-  userModel.findOne({ email: savedEmail }).then(async (result) => {
-    if (result) {
-      if (result.email == savedEmail) {
-        const hashedPassword = await bcrypt.compare(password, result.password);
-        const payload = {
-          role: result.role,
-        };
-        const options = {
-          expiresIn: "600m",
-        };
-        if (hashedPassword) {
-          const token = jwt.sign(payload, secret, options);
-          res.status(200).json({ result, token });
+  try {
+    userModel.findOne({ email: savedEmail }).then(async (result) => {
+      if (result) {
+        if (result.email == savedEmail) {
+          const hashedPassword = await bcrypt.compare(
+            password,
+            result.password
+          );
+          const payload = {
+            role: result.role,
+          };
+          const options = {
+            expiresIn: "600m",
+          };
+          if (hashedPassword) {
+            const token = jwt.sign(payload, secret, options);
+            res.status(200).json({ result, token });
+          } else {
+            res.status(400).send("invalid email or password");
+          }
         } else {
           res.status(400).send("invalid email or password");
         }
       } else {
-        res.status(400).send("invalid email or password");
+        res.status(404).send("this email not exist!");
       }
-    } else {
-      res.status(404).send("this email not exist!");
-    }
-  });
+    });
+  } catch (error) {
+    res.status(400).send(error);
+  }
 };
 
 // log Out user
 const logOut = (req, res) => {
-  // try {
-  //   res.clearCookie("clear");
-  //   res.send({ message: "log out successfully" });
-  // } catch (error) {
-  //   return res.json(null);
-  // }
+  try {
+    res.clearCookie("clear").then((result) => {
+      res.status(200).send(result);
+    });
+  } catch (error) {
+    res.status(400).json(error);
+  }
 };
 
 module.exports = {
